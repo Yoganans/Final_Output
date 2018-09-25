@@ -21,7 +21,11 @@ public class MyStore {
 	
 	private static WebDriver driver;
 	public static WebDriverWait webWait;
+	
 	public static String orderReference;
+	public static String userNameUpdation;
+	
+	
 	
 /*	public MyStore(WebDriver driver){
 		MyStore.driver=driver;
@@ -30,16 +34,16 @@ public class MyStore {
 	public static String appUrl="http://automationpractice.com";
 	//public static MyStore ObjForMyStore=new MyStore(driver); 
 	
-	public static void main(String args[]) throws InterruptedException{
+	/*public static void main(String args[]) throws InterruptedException{
 		setDriver("chrome", appUrl);
 		appLogin("someone@example.com", "Password123");
 		tShirtOrder();		
 		orderValidation();
 		personalUpdate("Password123");
-	}
+	}*/
 	
-	public static void setDriver(String browserType, String applicationUrl){
-		appUrl=applicationUrl;
+	public static void setDriver(String browserType){
+		//appUrl=applicationUrl;
 		
 		switch(browserType){
 		case "chrome":
@@ -95,7 +99,7 @@ public class MyStore {
 		driver.findElement(By.xpath("(//label[text()='Email address'])[2]/following-sibling::input")).sendKeys(userName);
 		driver.findElement(By.xpath("//input[@id='passwd']")).sendKeys(password);
 		driver.findElement(By.xpath("(//button[@type='submit']//span)[3]")).click();
-	}
+		}
 	
 	public static void tShirtOrder() throws InterruptedException{
 		/*webWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("(//a[@title='T-shirts'])[2]"))).click();
@@ -134,31 +138,45 @@ public class MyStore {
 	public static void orderValidation() throws InterruptedException{
 		JavascriptExecutor jsx=(JavascriptExecutor)driver;
 		driver.findElement(By.xpath("//a[@class='account']//span")).click();
-		Thread.sleep(5000);
-		//WebElement element=driver.findElement(By.xpath("//a[@title='Orders']//span"));
-		/*WebElement element=driver.findElement(By.xpath("//span[text()='Order history and details']"));
+		try {
+			Thread.sleep(10000);
+			//WebElement element=driver.findElement(By.xpath("//a[@title='Orders']//span"));
+			/*WebElement element=driver.findElement(By.xpath("//span[text()='Order history and details']"));
+			element.click();*/
+			driver.findElement(By.linkText("ORDER HISTORY AND DETAILS")).click();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e);
+		}
+		/*WebElement element=webWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText("ORDER HITORY AND DETAILS")));
 		element.click();*/
-		driver.findElement(By.linkText("ORDER HISTORY AND DETAILS")).click();
 		//jsx.executeScript("arguments[0].click;", element);
-		Thread.sleep(5000);
+		Thread.sleep(3000);
 		driver.navigate().refresh();
+		//driver.navigate().to(appUrl);
 		Thread.sleep(5000);
-		String orderValidation=driver.findElement(By.xpath("(//td[@class='history_link bold']//a)[1]")).getAttribute("innerText").trim();
+		//String orderValidation=driver.findElement(By.xpath("(//td[@class='history_link bold']//a)[1]")).getAttribute("innerText").trim();
+		String orderValidation=driver.findElement(By.xpath("//a[@class='color-myaccount']")).getAttribute("innerText");
 		Assert.assertTrue(orderReference.contains(orderValidation), "Recent ordered item is not in the top list in Order history table");
 		System.out.println("Scenario 1 PASSED");
 		}
 	
-	public static void personalUpdate(String currentPassword) throws InterruptedException{
+	public static void personalUpdate(String newFirstName, String currentPassword) throws InterruptedException{
 		driver.findElement(By.xpath("//a[@class='account']//span")).click();
 		Thread.sleep(3000);
 		driver.findElement(By.linkText("MY PERSONAL INFORMATION")).click();
 		Thread.sleep(3000);
 		WebElement element=driver.findElement(By.xpath("//label[@for='firstname']/following-sibling::input"));
 		element.clear();
-		element.sendKeys("Yoga");
+		element.sendKeys(newFirstName);
 		driver.findElement(By.xpath("//label[@for='old_passwd']/following-sibling::input")).sendKeys(currentPassword);
 		driver.findElement(By.xpath("//span[text()='Save']")).click();
-		System.out.println("Scenario 2 PASSED");
+		userNameUpdation=newFirstName;
 		
-	}
+		}
+	
+	public static void firstNameUpdateValidation(){
+		Assert.assertTrue(driver.findElement(By.xpath("//a[@class='account']//span")).getText().contains(userNameUpdation), "First Name is not updated");
+		}
 }
